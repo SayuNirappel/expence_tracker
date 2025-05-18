@@ -145,6 +145,16 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .doc(user!.uid)
+                                      .collection("expenses")
+                                      .doc(snapshot.data!.docs[index].id)
+                                      .delete();
+                                },
+                                icon: Icon(Icons.delete)),
                           ),
                         ),
                       ],
