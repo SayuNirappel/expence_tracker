@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expence_tracker/core/utils/app_utils.dart';
+import 'package:expence_tracker/shared/lists/category_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -11,16 +13,8 @@ class AddScreen extends StatefulWidget {
 
 class _AddScreenState extends State<AddScreen> {
   String? selectedCategory;
-  final List<String> categories = [
-    "Family",
-    "Food",
-    "Transport",
-    "Shopping",
-    "Bills",
-    "Medical",
-    "Personal",
-    "Others"
-  ];
+  final List<String> categories = CategoryList().categories;
+
   @override
   Widget build(BuildContext context) {
     final formkey = GlobalKey<FormState>();
@@ -61,8 +55,12 @@ class _AddScreenState extends State<AddScreen> {
           'category': category,
           'timestamp': FieldValue.serverTimestamp(),
         });
-
-        Navigator.pop(context); // Close the form screen
+        AppUtils.showSnackbar(context, message: "Expense Added");
+        //delay for snack bar and fb updation
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pop(context);
+        });
+        // Close the form screen
       }
     }
 
