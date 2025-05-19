@@ -21,13 +21,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
-      ChangeNotifierProvider(
-          create: (context) => RegistrationScreenViewModel()),
-      ChangeNotifierProvider(create: (context) => LoginScreenViewModel()),
-      ChangeNotifierProvider(create: (context) => SearchScreenViewModel()),
-      ChangeNotifierProvider(create: (context) => HomeScreenViewModel()),
-      ChangeNotifierProvider(create: (context) => AddScreenViewModel())
-    ], child: MaterialApp(home: SplashScreen()));
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+              create: (context) => RegistrationScreenViewModel()),
+          ChangeNotifierProvider(create: (context) => LoginScreenViewModel()),
+          ChangeNotifierProvider(create: (context) => SearchScreenViewModel()),
+          ChangeNotifierProvider(create: (context) => HomeScreenViewModel()),
+          ChangeNotifierProvider(create: (context) => AddScreenViewModel())
+        ],
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false, home: SplashScreen()));
   }
 }

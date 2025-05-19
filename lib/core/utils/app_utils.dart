@@ -4,7 +4,7 @@ class AppUtils {
   static showSnackbar(
     BuildContext context, {
     required String message,
-    Color bgColor = Colors.red,
+    Color bgColor = Colors.deepPurple,
   }) {
     ScaffoldMessenger.of(
       context,
