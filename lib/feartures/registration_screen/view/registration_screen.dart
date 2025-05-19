@@ -44,12 +44,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
+                    color: Colors.red,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Please fill the form to continue',
+                  "Fill the form to continue",
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
@@ -141,7 +141,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -159,6 +159,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     child: const Text(
                       'Register',
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),

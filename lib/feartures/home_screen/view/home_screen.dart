@@ -1,29 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expence_tracker/core/utils/app_utils.dart';
 import 'package:expence_tracker/feartures/add_screen/view/add_screen.dart';
+import 'package:expence_tracker/feartures/home_screen/view_model/home_screen_view_model.dart';
 import 'package:expence_tracker/feartures/search_screen/view/search_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<HomeScreenViewModel>(context);
     final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => AddScreen()));
         },
-        focusColor: Colors.red,
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: Colors.red,
+        ),
       ),
       appBar: AppBar(
         title: Text(
           "Expense Tracker",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style:
+              TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
         ),
         actions: [
           IconButton(
@@ -31,139 +38,126 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => SearchScreen()));
             },
-            icon: Icon(Icons.search),
+            icon: Icon(
+              Icons.search,
+              color: Colors.red,
+            ),
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           IconButton(
             onPressed: () async {
-              // loggout  using in built function
               await FirebaseAuth.instance.signOut();
             },
-            icon: Icon(Icons.logout),
+            icon: Icon(
+              Icons.person,
+              color: Colors.deepPurple,
+            ),
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
         ],
       ),
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection("users")
-              .doc(user!.uid)
-              .collection("expenses")
-              .orderBy("timestamp", descending: true)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Text("Something went Wrong");
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            }
+        stream: viewModel.expenseStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return const Text("Something went wrong");
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            final docs = snapshot.data!.docs;
-// finding todays total
-            double todaysTotal = 0;
-            final now = DateTime.now();
-            for (var doc in docs) {
-              final timestamp = (doc["timestamp"] as Timestamp).toDate();
-              if (timestamp.year == now.year &&
-                  timestamp.month == now.month &&
-                  timestamp.day == now.day) {
-                todaysTotal += (doc["amount"] as num).toDouble();
-              }
-            }
+          final docs = snapshot.data!.docs;
+          final todaysTotal = viewModel.calculateTodaysTotal(docs);
 
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.deepOrange)),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Today",
-                            style: TextStyle(color: Colors.deepPurple),
-                          ),
-                          Text(
-                            "$todaysTotal",
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.deepPurple, width: 3),
+                    ),
+                    child: Column(
+                      children: [
+                        Text("Today",
                             style: TextStyle(
-                                color: Colors.deepPurple,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 50),
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold)),
+                        Text(
+                          "$todaysTotal",
+                          style: TextStyle(
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 50,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                //list of expense
-                SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
                   final doc = docs[index];
                   final amount = doc['amount'];
                   final category = doc['category'];
                   final dandt = (doc["timestamp"] as Timestamp).toDate();
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 10,
-                        ),
+                        SizedBox(height: 10),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             border: Border.all(
-                                color: AppUtils.colorPick(amount: amount),
-                                width: 2),
+                              color: AppUtils.colorPick(amount: amount),
+                              width: 2,
+                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: ListTile(
                             title: Text(
                               amount.toString(),
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppUtils.colorPick(amount: amount),
-                                  fontSize: 30),
+                                fontWeight: FontWeight.bold,
+                                color: AppUtils.colorPick(amount: amount),
+                                fontSize: 30,
+                              ),
                             ),
                             subtitle: Row(
                               children: [
                                 Text(
-                                  "${category} : ",
+                                  "$category : ",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  "${dandt.day.toString()}/${dandt.month.toString()}/${dandt.year.toString()} ",
+                                  "${dandt.day}/${dandt.month}/${dandt.year}",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
                             trailing: IconButton(
-                                onPressed: () {
-                                  FirebaseFirestore.instance
-                                      .collection("users")
-                                      .doc(user!.uid)
-                                      .collection("expenses")
-                                      .doc(snapshot.data!.docs[index].id)
-                                      .delete();
-                                },
-                                icon: Icon(Icons.delete)),
+                              onPressed: () {
+                                viewModel.deleteExpense(doc.id);
+                              },
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   );
-                }, childCount: docs.length))
-              ],
-            );
-          }),
+                }, childCount: docs.length),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

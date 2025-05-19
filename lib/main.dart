@@ -1,5 +1,8 @@
+import 'package:expence_tracker/feartures/add_screen/view_model/add_scree_view_model.dart';
+import 'package:expence_tracker/feartures/home_screen/view_model/home_screen_view_model.dart';
 import 'package:expence_tracker/feartures/login_screen/view_model/login_screen_view_model.dart';
 import 'package:expence_tracker/feartures/registration_screen/view_model/registration_screen_view_model.dart';
+import 'package:expence_tracker/feartures/search_screen/view_model/search_screen_view_model.dart';
 
 import 'package:expence_tracker/feartures/splash_screen/view/splash_screen.dart';
 import 'package:expence_tracker/firebase_options.dart';
@@ -21,7 +24,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(providers: [
       ChangeNotifierProvider(
           create: (context) => RegistrationScreenViewModel()),
-      ChangeNotifierProvider(create: (context) => LoginScreenViewModel())
+      ChangeNotifierProvider(create: (context) => LoginScreenViewModel()),
+      ChangeNotifierProvider(create: (context) => SearchScreenViewModel()),
+      ChangeNotifierProvider(create: (context) => HomeScreenViewModel()),
+      ChangeNotifierProvider(create: (context) => AddScreenViewModel())
     ], child: MaterialApp(home: SplashScreen()));
   }
 }
